@@ -1,0 +1,73 @@
+# Maintainer: ELECTRO
+pkgname=snipshot
+pkgver=0.0.1.r1.gcd7665d
+pkgrel=1
+pkgdesc="Snipping Tool style screenshots, screen recordings and text extraction for Wayland"
+arch=('x86_64')
+license=('GPL-3.0-or-later' 'MIT')
+depends=(
+    'grim'
+    'gtk3'
+    'layer-shell-qt'
+    'qt6-base'
+    'qt6-declarative'
+    'qt6-multimedia'
+    'qt6-multimedia-ffmpeg'
+    'tesseract'
+    'wl-clipboard'
+)
+makedepends=(
+    'cmake'
+    'git'
+    'ninja'
+    'zig>=0.17'
+)
+optdepends=(
+    'gpu-screen-recorder: hardware encoded recording'
+    'wf-recorder: recording fallback'
+    'ffmpeg: joining paused wf-recorder recordings and mixing in the mic'
+    'xdg-desktop-portal: Save as dialog and following the system light or dark setting'
+)
+
+_repodir() { cd "$startdir/.." && pwd; }
+
+prepare() {
+    local _repo="$(_repodir)"
+    rm -rf "$srcdir/$pkgname"
+    mkdir -p "$srcdir/$pkgname"
+
+    # Package the working tree as it is, uncommitted and untracked files included
+    msg2 "Copying the working tree..."
+    git -C "$_repo" ls-files -z --cached --others --exclude-standard -- . ':!packaging' |
+        while IFS= read -r -d '' _file; do
+            [[ -e "$_repo/$_file" ]] || continue
+            install -Dm644 "$_repo/$_file" "$srcdir/$pkgname/$_file"
+        done
+}
+
+pkgver() {
+    local _repo="$(_repodir)"
+    local _version="$(sed -n 's/^project(SnipShot VERSION \([0-9.]*\).*/\1/p' "$_repo/CMakeLists.txt")"
+    printf "%s.r%s.g%s" "$_version" "$(git -C "$_repo" rev-list --count HEAD)" "$(git -C "$_repo" rev-parse --short HEAD)"
+}
+
+build() {
+    cmake -S "$pkgname" -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+}
+
+check() {
+    cd "$pkgname"
+    ZIG_GLOBAL_CACHE_DIR="$srcdir/build/zig-cache" zig test src/core.zig -lc
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+
+    cd "$pkgname"
+    install -Dm644 data/themes/Midnight.json "$pkgdir/usr/share/doc/$pkgname/themes/Midnight.json"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 ui/icons/LICENSE "$pkgdir/usr/share/licenses/$pkgname/fluentui-system-icons-LICENSE"
+}

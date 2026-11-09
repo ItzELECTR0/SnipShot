@@ -1,0 +1,24 @@
+[Desktop Entry]
+Type=Application
+Name=SnipShot
+GenericName=Screenshot Tool
+Comment=Snip, record and read text from your screen
+Exec=snipshot open
+Icon=applets-screenshooter
+Terminal=false
+Categories=Utility;Graphics;
+Keywords=screenshot;snip;record;ocr;text;
+StartupNotify=false
+Actions=Snip;Record;Text;
+
+[Desktop Action Snip]
+Name=New snip
+Exec=snipshot snip
+
+[Desktop Action Record]
+Name=New recording
+Exec=snipshot record
+
+[Desktop Action Text]
+Name=Extract text
+Exec=snipshot text
