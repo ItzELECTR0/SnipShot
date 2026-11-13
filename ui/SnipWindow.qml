@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import SnipShot.Core
 
@@ -10,7 +10,7 @@ Window {
 
     visible: Capture.snipOpen
     title: "SnipShot Snip"
-    color: Theme.window
+    color: Theme.surface
     minimumWidth: 560
     minimumHeight: 360
     readonly property int preferredWidth: Math.max(minimumWidth, Math.min(Capture.resultSize.width + 48, Screen.desktopAvailableWidth * 0.8))
@@ -74,12 +74,14 @@ Window {
             }
             IconButton {
                 icon: "more_horizontal_regular"
-                tooltip: qsTr("See more")
-                onClicked: menu.popup(this, 0, height)
-                Menu {
+                tooltip: menu.visible ? "" : qsTr("More")
+                onClicked: menu.open()
+                PopupMenu {
                     id: menu
-                    MenuItem { text: qsTr("Open with default app"); onTriggered: Capture.openResultExternally() }
-                    MenuItem { text: qsTr("Settings"); onTriggered: Capture.showSettings() }
+                    x: parent.width - width
+                    y: parent.height + 4
+                    Action { text: qsTr("Open with default app"); onTriggered: Capture.openResultExternally() }
+                    Action { text: qsTr("Settings"); onTriggered: Capture.showSettings() }
                 }
             }
         }
@@ -87,7 +89,10 @@ Window {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: Theme.dark ? "#1a1a1a" : "#ebebeb"
+            color: Theme.containerLow
+
+            Rectangle { width: parent.width; height: 1; color: Theme.outlineVariant; z: 1 }
+            Rectangle { width: parent.width; height: 1; anchors.bottom: parent.bottom; color: Theme.outlineVariant; z: 1 }
             clip: true
 
             Flickable {
@@ -98,8 +103,8 @@ Window {
                 contentWidth: window.actualSize ? Math.max(width, Capture.resultSize.width) : width
                 contentHeight: window.actualSize ? Math.max(height, Capture.resultSize.height) : height
                 interactive: window.actualSize
-                ScrollBar.horizontal: ScrollBar { policy: window.actualSize ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff }
-                ScrollBar.vertical: ScrollBar { policy: window.actualSize ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff }
+                ScrollBar.horizontal: Scroller { policy: window.actualSize ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff }
+                ScrollBar.vertical: Scroller { policy: window.actualSize ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff }
 
                 Image {
                     readonly property real fitScale: Math.min(1, flick.width / Math.max(1, Capture.resultSize.width), flick.height / Math.max(1, Capture.resultSize.height))
@@ -132,18 +137,18 @@ Window {
             Layout.bottomMargin: 8
             Text {
                 text: Capture.resultSize.width + " × " + Capture.resultSize.height + (window.image ? " px" : "")
-                color: Theme.textSecondary
+                color: Theme.textMuted
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.captionSize
+                font.pixelSize: Theme.smallSize
             }
             Text {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignRight
                 text: Capture.resultSaved ? Capture.resultPath : qsTr("Not saved yet")
                 elide: Text.ElideMiddle
-                color: Theme.textSecondary
+                color: Theme.textMuted
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.captionSize
+                font.pixelSize: Theme.smallSize
             }
         }
     }

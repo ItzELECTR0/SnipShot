@@ -12,7 +12,7 @@ Surface {
         width: 1
         height: 20
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-        color: Theme.stroke
+        color: Theme.outlineVariant
     }
 
     Row {

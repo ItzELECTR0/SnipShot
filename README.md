@@ -13,7 +13,7 @@ SnipShot is a screenshot, screen recording and text extraction tool for Linux, m
 | Snip | Freezes the screen and lets you pick a rectangle, a window, a whole screen or a freeform shape |
 | Record | Records an area with a 3-2-1 countdown, pause, mic and system audio |
 | Extract text | Reads the text in an area with Tesseract and puts it on the clipboard |
-| Themes | Fluent (light or dark), your Qt platform theme (qt6ct, KDE colours) or a custom JSON theme |
+| Themes | Material light or dark with an accent colour, or your own JSON theme |
 
 Snips go straight to the clipboard, and a notification opens them in SnipShot.
 
@@ -45,11 +45,11 @@ In the overlay, `Esc` or a right click cancels and `Enter` starts an armed recor
 
 Screenshots go to `~/Pictures/SnipShot` and recordings to `~/Videos/SnipShot`. You can change both in settings, or set `SNIPSHOT_OUTPUT_DIR` to override everything.
 
-Custom themes are JSON files in `~/.config/SnipShot/themes/`. Any token you leave out comes from the base theme. There's an example in `data/themes/Midnight.json`.
+Custom themes are JSON files in `~/.config/SnipShot/themes/`. Anything you leave out comes from Material. There's an example in `data/themes/Midnight.json`.
 
 ## Prerequisites
 
-- Zig 0.17
+- Zig 0.17 or newer
 - Qt 6.8 or newer with Quick, Quick Controls, QML, Multimedia and D-Bus
 - LayerShellQt
 - CMake, Ninja and a C++20 compiler

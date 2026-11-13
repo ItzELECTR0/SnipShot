@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import SnipShot.Core
 
 Window {
@@ -24,11 +23,8 @@ Window {
             id: row
             anchors.centerIn: parent
             spacing: 10
-            BusyIndicator {
+            Spinner {
                 visible: Capture.pillBusy
-                running: visible
-                implicitWidth: 18
-                implicitHeight: 18
                 anchors.verticalCenter: parent.verticalCenter
             }
             FluentIcon {
@@ -42,7 +38,7 @@ Window {
                 text: Capture.pillText
                 color: Theme.text
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSize
+                font.pixelSize: Theme.textSize
                 width: Math.min(implicitWidth, 560)
                 elide: Text.ElideRight
             }

@@ -6,7 +6,6 @@ Run GUI checks in a Wardian session (headless sway). Launch with a scratch confi
 
 ```sh
 printf '[General]\nrecorderBackend=2\n' > "$SCRATCH/config/SnipShot/SnipShot.conf"
-ln -sfn ~/.config/qt6ct "$SCRATCH/config/qt6ct"   # Desktop theme tests need the real qt6ct config
 wardian -s NAME run --name app -e XDG_CONFIG_HOME="$SCRATCH/config" -e SNIPSHOT_OUTPUT_DIR="$SCRATCH/out" -- build/snipshot --daemon
 wardian -s NAME exec -- build/snipshot snip
 ```

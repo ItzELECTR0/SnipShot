@@ -13,7 +13,7 @@ Window {
         anchors.fill: parent
         color: "transparent"
         border.width: 3
-        border.color: Capture.paused ? Theme.textSecondary : Theme.recordFill
+        border.color: Capture.paused ? Theme.textMuted : Theme.record
     }
 
     Rectangle {

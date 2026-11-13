@@ -70,7 +70,7 @@ Window {
         height: overlay.selection.height + 2
         color: "transparent"
         border.width: 1
-        border.color: overlay.live ? Theme.recordFill : "#ffffff"
+        border.color: overlay.live ? Theme.record : "#ffffff"
         Rectangle {
             anchors.fill: parent
             anchors.margins: -1
@@ -151,7 +151,7 @@ Window {
             text: Math.round(overlay.selection.width * ratio) + " × " + Math.round(overlay.selection.height * ratio)
             color: "#ffffff"
             font.family: Theme.fontFamily
-            font.pixelSize: Theme.captionSize
+            font.pixelSize: Theme.smallSize
         }
     }
 

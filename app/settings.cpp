@@ -25,9 +25,6 @@ const Default defaults[] = {
     {"microphone", false},
     {"systemAudio", true},
     {"notifications", true},
-    {"themeSource", QStringLiteral("fluent")},
-    {"colorScheme", QStringLiteral("system")},
-    {"customTheme", QString()},
     {"desktopIcons", false},
 };
 }

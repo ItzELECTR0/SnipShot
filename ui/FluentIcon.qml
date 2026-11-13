@@ -13,7 +13,7 @@ Item {
     implicitHeight: size
 
     readonly property string desktopName: Theme.desktopIcons ? (Theme.desktopIconNames[name] || "") : ""
-    readonly property bool useDesktop: desktopName.length > 0 && ThemeFiles.hasDesktopIcon(desktopName)
+    readonly property bool useDesktop: desktopName.length > 0 && Appearance.hasDesktopIcon(desktopName)
 
     Image {
         anchors.fill: parent

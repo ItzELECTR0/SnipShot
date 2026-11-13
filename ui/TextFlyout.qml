@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import SnipShot.Core
 
@@ -35,7 +35,7 @@ Window {
                     text: qsTr("Extracted text")
                     color: Theme.text
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize
+                    font.pixelSize: Theme.textSize
                     font.weight: Font.DemiBold
                 }
                 IconButton {
@@ -51,8 +51,10 @@ Window {
             }
 
             ScrollView {
+                id: scroll
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                ScrollBar.vertical: Scroller { parent: scroll; x: scroll.width - width; y: 2; height: scroll.height - 4 }
                 TextArea {
                     text: Capture.recognizedText
                     readOnly: true
@@ -60,12 +62,15 @@ Window {
                     selectByMouse: true
                     wrapMode: TextEdit.Wrap
                     color: Theme.text
+                    selectionColor: Theme.selection
+                    selectedTextColor: Theme.text
+                    padding: 10
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize
+                    font.pixelSize: Theme.textSize
                     background: Rectangle {
                         radius: Theme.controlRadius
-                        color: Theme.surface
-                        border.color: Theme.stroke
+                        color: Theme.containerLow
+                        border.color: Theme.outlineVariant
                     }
                 }
             }

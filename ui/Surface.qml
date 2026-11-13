@@ -12,18 +12,18 @@ Item {
         anchors.fill: panel
         visible: surface.elevated
         radius: panel.radius
-        blur: 24
+        blur: 20
         spread: 0
-        offset.y: 6
+        offset.y: 4
         color: Theme.shadow
     }
 
     Rectangle {
         id: panel
         anchors.fill: parent
-        color: Theme.flyout
+        color: Theme.surface
         radius: Theme.radius
         border.width: 1
-        border.color: Theme.stroke
+        border.color: Theme.outlineVariant
     }
 }

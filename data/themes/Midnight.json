@@ -1,14 +1,9 @@
 {
-    "base": "fluent",
-    "dark": true,
-    "window": "#11131a",
-    "surface": "#181b24",
-    "flyout": "#1c202b",
-    "stroke": "#2a3040",
-    "text": "#e6e9f2",
-    "textSecondary": "#9aa3b8",
-    "accent": "#8aa8ff",
-    "accentHover": "#a3bbff",
-    "accentText": "#0b0d14",
-    "radius": 10
+    "base": "dark",
+    "radius": 10,
+    "colors": {
+        "surface": "#11131a",
+        "on_surface": "#e6e9f2",
+        "primary": "#8aa8ff"
+    }
 }

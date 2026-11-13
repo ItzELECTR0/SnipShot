@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import QtMultimedia
 import SnipShot.Core
@@ -78,12 +77,12 @@ Item {
             }
             Text {
                 text: preview.clock(player.position)
-                color: Theme.textSecondary
+                color: Theme.textMuted
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.captionSize
+                font.pixelSize: Theme.smallSize
                 font.features: { "tnum": 1 }
             }
-            Slider {
+            SeekSlider {
                 Layout.fillWidth: true
                 from: 0
                 to: Math.max(1, player.duration)
@@ -92,9 +91,9 @@ Item {
             }
             Text {
                 text: preview.clock(player.duration)
-                color: Theme.textSecondary
+                color: Theme.textMuted
                 font.family: Theme.fontFamily
-                font.pixelSize: Theme.captionSize
+                font.pixelSize: Theme.smallSize
                 font.features: { "tnum": 1 }
             }
         }

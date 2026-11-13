@@ -1,10 +1,7 @@
 #pragma once
 
 #include <QObject>
-#include <QDBusVariant>
 #include <QStringList>
-
-#include <functional>
 
 inline constexpr auto SnipShotService = "net.electris.SnipShot";
 inline constexpr auto SnipShotObjectPath = "/net/electris/SnipShot";
@@ -23,17 +20,4 @@ public slots:
 
 private:
     CaptureBackend *m_backend;
-};
-
-class AppearanceWatcher final : public QObject {
-    Q_OBJECT
-
-public:
-    explicit AppearanceWatcher(std::function<void()> changed);
-
-private slots:
-    void settingChanged(const QString &group, const QString &key, const QDBusVariant &value);
-
-private:
-    std::function<void()> m_changed;
 };

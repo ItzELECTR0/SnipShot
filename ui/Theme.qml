@@ -3,68 +3,38 @@ import QtQuick
 import SnipShot.Core
 
 QtObject {
-    id: theme
-
-    readonly property string source: Config.themeSource
-    readonly property var custom: source === "custom" ? ThemeFiles.loadTheme(Config.customTheme) : ({})
-    readonly property string base: source === "custom" ? (custom.base === "desktop" ? "desktop" : "fluent") : source
+    readonly property var colors: Appearance.colors
+    readonly property bool dark: Appearance.dark
     readonly property bool desktopIcons: Config.desktopIcons
 
-    property SystemPalette palette: SystemPalette { colorGroup: SystemPalette.Active }
-    property SystemPalette disabledPalette: SystemPalette { colorGroup: SystemPalette.Disabled }
+    readonly property color surface: colors.surface
+    readonly property color containerLow: colors.surface_container_low
+    readonly property color container: colors.surface_container
+    readonly property color containerHigh: colors.surface_container_high
+    readonly property color containerHighest: colors.surface_container_highest
+    readonly property color text: colors.on_surface
+    readonly property color textMuted: colors.on_surface_variant
+    readonly property color outline: colors.outline
+    readonly property color outlineVariant: colors.outline_variant
+    readonly property color accent: colors.primary
+    readonly property color onAccent: colors.on_primary
+    readonly property color record: colors.error
 
-    readonly property bool systemDark: Application.styleHints.colorScheme === Qt.ColorScheme.Dark
-    readonly property bool dark: {
-        if (custom.dark !== undefined) return custom.dark
-        if (base === "desktop") return luminance(palette.window) < 0.5
-        if (Config.colorScheme === "dark") return true
-        if (Config.colorScheme === "light") return false
-        return systemDark
-    }
+    readonly property color hover: Qt.alpha(text, 0.07)
+    readonly property color pressed: Qt.alpha(text, 0.12)
+    readonly property color selection: Qt.alpha(accent, dark ? 0.22 : 0.18)
+    readonly property color shadow: Qt.alpha(colors.shadow, dark ? 0.5 : 0.18)
+    readonly property color dim: "#80000000"
 
-    function luminance(color) { return 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b }
-    function pick(name, fluentDark, fluentLight, desktop) {
-        if (custom[name] !== undefined) return custom[name]
-        if (base === "desktop") return desktop
-        return dark ? fluentDark : fluentLight
-    }
-    function alpha(color, opacity) { return Qt.rgba(color.r, color.g, color.b, opacity) }
+    readonly property int radius: Appearance.radius
+    readonly property int radiusSmall: Math.max(2, Math.round(radius * 0.6))
+    readonly property int controlRadius: radiusSmall + 2
 
-    readonly property color window: pick("window", "#202020", "#f3f3f3", palette.window)
-    readonly property color surface: pick("surface", "#2c2c2c", "#f9f9f9", palette.base)
-    readonly property color flyout: pick("flyout", "#2c2c2c", "#fcfcfc", palette.window)
-    readonly property color control: pick("control", "#0fffffff", "#b3ffffff", alpha(palette.button, 0.9))
-    readonly property color controlHover: pick("controlHover", "#15ffffff", "#80f9f9f9", Qt.lighter(palette.button, dark ? 1.25 : 1.05))
-    readonly property color controlPressed: pick("controlPressed", "#08ffffff", "#4df9f9f9", Qt.darker(palette.button, 1.1))
-    readonly property color subtleHover: pick("subtleHover", "#0fffffff", "#0a000000", alpha(palette.windowText, 0.08))
-    readonly property color subtlePressed: pick("subtlePressed", "#0affffff", "#06000000", alpha(palette.windowText, 0.05))
-    readonly property color selected: pick("selected", "#14ffffff", "#0f000000", alpha(palette.highlight, 0.22))
-    readonly property color stroke: pick("stroke", "#17ffffff", "#0f000000", alpha(palette.windowText, 0.14))
-    readonly property color strokeStrong: pick("strokeStrong", "#33000000", "#29000000", alpha(palette.shadow, 0.5))
-    readonly property color text: pick("text", "#ffffff", "#e4000000", palette.windowText)
-    readonly property color textSecondary: pick("textSecondary", "#c5ffffff", "#9e000000", alpha(palette.windowText, 0.7))
-    readonly property color textDisabled: pick("textDisabled", "#5dffffff", "#5c000000", disabledPalette.windowText)
-    readonly property color accent: pick("accent", "#60cdff", "#005fb8", palette.highlight)
-    readonly property color accentHover: pick("accentHover", "#e660cdff", "#e6005fb8", Qt.lighter(palette.highlight, 1.1))
-    readonly property color accentText: pick("accentText", "#000000", "#ffffff", palette.highlightedText)
-    readonly property color record: pick("record", "#ff6b6b", "#c42b1c", "#e5484d")
-    readonly property color recordFill: pick("recordFill", "#e81123", "#e81123", "#e5484d")
-    readonly property color dim: custom.dim !== undefined ? custom.dim : "#80000000"
-    readonly property color shadow: dark ? "#66000000" : "#26000000"
-
-    readonly property string fontFamily: {
-        if (custom.fontFamily !== undefined) return custom.fontFamily
-        if (base === "desktop") return Qt.application.font.family
-        const families = Qt.fontFamilies()
-        for (const candidate of ["Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI"])
-            if (families.indexOf(candidate) !== -1) return candidate
-        return Qt.application.font.family
-    }
-    readonly property int fontSize: custom.fontSize !== undefined ? custom.fontSize : 14
-    readonly property int captionSize: fontSize - 2
-    readonly property int titleSize: fontSize + 6
-    readonly property int radius: custom.radius !== undefined ? custom.radius : (base === "desktop" ? 6 : 8)
-    readonly property int controlRadius: custom.controlRadius !== undefined ? custom.controlRadius : 4
+    readonly property string fontFamily: Qt.application.font.family
+    readonly property int textSize: 13
+    readonly property int smallSize: 11
+    readonly property int titleSize: 18
+    readonly property int controlHeight: 32
 
     readonly property var desktopIconNames: ({
         "add_regular": "list-add",

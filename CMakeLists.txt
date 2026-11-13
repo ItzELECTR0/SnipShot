@@ -29,8 +29,18 @@ set(QML_SOURCES
     ui/Theme.qml
     ui/FluentIcon.qml
     ui/IconButton.qml
-    ui/FluentField.qml
-    ui/FluentCombo.qml
+    ui/Tip.qml
+    ui/Segmented.qml
+    ui/Toggle.qml
+    ui/Dropdown.qml
+    ui/Field.qml
+    ui/Chip.qml
+    ui/PopupMenu.qml
+    ui/MenuDivider.qml
+    ui/Spinner.qml
+    ui/Scroller.qml
+    ui/SeekSlider.qml
+    ui/ColorPicker.qml
     ui/Surface.qml
     ui/CaptureOverlay.qml
     ui/CaptureBar.qml

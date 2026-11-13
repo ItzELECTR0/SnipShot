@@ -3,8 +3,10 @@
 SnipShot is a Linux capture tool modelled on the Windows Snipping Tool. The UI is Qt Quick/QML, the Qt host is a C++ bridge, and external-tool handling lives in Zig.
 
 - Keep capture, output paths, clipboard, recorder and other external-tool handling in `src/core.zig`.
+- The look is SnipShot's own (shared with GlyphPop), not Fluent or Windows styling. See `.agents/theming.md`.
 - Keep presentation and interaction in `ui/`. The C++ host in `app/` owns state, settings, pixel work and windows.
 - Do not add dependencies or claim desktop/backend support beyond what has been exercised. Hyprland and sway are the exercised desktops.
+- Zig 0.17 (the latest release) is the minimum and 0.18-dev must keep building too, so use only APIs both share.
 - Build with CMake (see README); unit tests are `zig test src/core.zig -lc`.
 
 ## Topics

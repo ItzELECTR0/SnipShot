@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import SnipShot.Core
 
 Surface {
@@ -32,7 +31,6 @@ Surface {
             icon: "record_filled"
             text: qsTr("Start")
             tooltip: qsTr("Start recording (Enter)")
-            implicitHeight: 32
             anchors.verticalCenter: parent.verticalCenter
             onClicked: Capture.startRecording()
         }
@@ -40,7 +38,7 @@ Surface {
         Item {
             visible: !bar.armed
             width: status.implicitWidth + 20
-            height: 36
+            height: Theme.controlHeight
             Row {
                 id: status
                 anchors.centerIn: parent
@@ -51,7 +49,7 @@ Surface {
                     width: 10
                     height: 10
                     radius: 5
-                    color: Capture.paused ? Theme.textSecondary : Theme.recordFill
+                    color: Capture.paused ? Theme.textMuted : Theme.record
                     SequentialAnimation on opacity {
                         running: bar.running && !Capture.paused
                         loops: Animation.Infinite
@@ -60,11 +58,8 @@ Surface {
                         NumberAnimation { to: 1; duration: 700; easing.type: Easing.InOutSine }
                     }
                 }
-                BusyIndicator {
+                Spinner {
                     visible: bar.waiting
-                    running: visible
-                    implicitWidth: 20
-                    implicitHeight: 20
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
@@ -73,9 +68,9 @@ Surface {
                         : bar.phase === "starting" ? qsTr("Starting")
                         : bar.phase === "finishing" ? qsTr("Saving")
                         : bar.clock(Capture.elapsed)
-                    color: Capture.paused && bar.running ? Theme.textSecondary : Theme.text
+                    color: Capture.paused && bar.running ? Theme.textMuted : Theme.text
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSize
+                    font.pixelSize: Theme.textSize
                     font.features: { "tnum": 1 }
                 }
             }
@@ -102,7 +97,7 @@ Surface {
         }
 
         Item { width: 6; height: 1 }
-        Rectangle { width: 1; height: 20; anchors.verticalCenter: parent.verticalCenter; color: Theme.stroke }
+        Rectangle { width: 1; height: 20; anchors.verticalCenter: parent.verticalCenter; color: Theme.outlineVariant }
         Item { width: 6; height: 1 }
 
         IconButton {

@@ -2,7 +2,7 @@
 
 ## Process model
 
-One resident instance owns the session bus name `net.electris.SnipShot` (object `/net/electris/SnipShot`, method `Activate(as)`). Any later `snipshot ...` invocation fails to register the name, forwards its arguments over D-Bus and exits. `handleCommand` in `app/capturebackend.cpp` is the single entry point for both paths. The app never quits when windows close; `snipshot quit` ends it. `restart()` releases the bus name before spawning the replacement so the new process becomes the primary.
+One resident instance owns the session bus name `net.electris.SnipShot` (object `/net/electris/SnipShot`, method `Activate(as)`). Any later `snipshot ...` invocation fails to register the name, forwards its arguments over D-Bus and exits. `handleCommand` in `app/capturebackend.cpp` is the single entry point for both paths. The app never quits when windows close; `snipshot quit` ends it.
 
 ## Layers
 

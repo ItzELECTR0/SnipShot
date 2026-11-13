@@ -931,13 +931,6 @@ void CaptureBackend::loadOcrLanguages() {
     });
 }
 
-void CaptureBackend::restart() {
-    QStringList arguments{m_settingsOpen ? "settings" : "open"};
-    QDBusConnection::sessionBus().unregisterService(SnipShotService);
-    QProcess::startDetached(QCoreApplication::applicationFilePath(), arguments);
-    QCoreApplication::quit();
-}
-
 void CaptureBackend::quit() {
     if (recordingState(m_state)) {
         showPill(tr("Stop the recording before quitting"), "record_filled");

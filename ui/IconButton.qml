@@ -1,20 +1,20 @@
 import QtQuick
-import QtQuick.Controls
 
 Item {
     id: button
     property string icon
     property string text
     property string tooltip
+    // subtle: flat until hovered; standard: outlined; accent: filled with the accent colour.
     property string variant: "subtle"
     property bool checked: false
-    property color iconColor: variant === "accent" ? Theme.accentText : checked ? Theme.accent : Theme.text
+    property color iconColor: variant === "accent" ? Theme.onAccent : Theme.text
     property int iconSize: 16
     signal clicked()
 
-    implicitWidth: text.length > 0 ? row.implicitWidth + 24 : 36
-    implicitHeight: 36
-    opacity: enabled ? 1 : 0.45
+    implicitWidth: text.length > 0 ? row.implicitWidth + 24 : Theme.controlHeight
+    implicitHeight: Theme.controlHeight
+    opacity: enabled ? 1 : 0.4
     activeFocusOnTab: true
     Accessible.role: Accessible.Button
     Accessible.name: tooltip.length > 0 ? tooltip : text
@@ -27,32 +27,20 @@ Item {
         radius: Theme.controlRadius
         color: {
             if (button.variant === "accent")
-                return mouse.pressed ? Qt.darker(Theme.accent, 1.1) : mouse.containsMouse ? Theme.accentHover : Theme.accent
-            if (button.variant === "standard")
-                return mouse.pressed ? Theme.controlPressed : mouse.containsMouse ? Theme.controlHover : Theme.control
-            if (mouse.pressed) return Theme.subtlePressed
-            if (button.checked) return Theme.selected
-            return mouse.containsMouse ? Theme.subtleHover : "transparent"
+                return mouse.pressed ? Qt.darker(Theme.accent, 1.15) : mouse.containsMouse ? Qt.lighter(Theme.accent, Theme.dark ? 0.92 : 1.15) : Theme.accent
+            if (mouse.pressed) return Theme.pressed
+            if (button.checked) return Theme.containerHighest
+            if (mouse.containsMouse) return Theme.hover
+            return button.variant === "standard" ? Theme.containerLow : "transparent"
         }
         border.width: button.variant === "standard" || button.activeFocus ? 1 : 0
-        border.color: button.activeFocus ? Theme.text : Theme.stroke
-    }
-
-    Rectangle {
-        visible: button.checked && button.variant === "subtle"
-        width: 14
-        height: 3
-        radius: 1.5
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 2
-        anchors.horizontalCenter: parent.horizontalCenter
-        color: Theme.accent
+        border.color: button.activeFocus ? Theme.accent : Theme.outlineVariant
     }
 
     Row {
         id: row
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 7
         FluentIcon {
             visible: button.icon.length > 0
             anchors.verticalCenter: parent.verticalCenter
@@ -64,9 +52,10 @@ Item {
             visible: button.text.length > 0
             anchors.verticalCenter: parent.verticalCenter
             text: button.text
-            color: button.variant === "accent" ? Theme.accentText : Theme.text
+            color: button.variant === "accent" ? Theme.onAccent : Theme.text
             font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSize
+            font.pixelSize: Theme.textSize
+            font.weight: button.variant === "accent" ? Font.DemiBold : Font.Normal
         }
     }
 
@@ -78,7 +67,8 @@ Item {
         onClicked: button.clicked()
     }
 
-    ToolTip.visible: mouse.containsMouse && tooltip.length > 0
-    ToolTip.text: tooltip
-    ToolTip.delay: 600
+    Tip {
+        visible: mouse.containsMouse && button.tooltip.length > 0
+        text: button.tooltip
+    }
 }

@@ -121,7 +121,6 @@ public:
     Q_INVOKABLE void closeSnip();
     Q_INVOKABLE void closeText();
     Q_INVOKABLE void showPill(const QString &text, const QString &icon = QString(), bool busy = false, int timeoutMs = 2500);
-    Q_INVOKABLE void restart();
     Q_INVOKABLE void quit();
     Q_INVOKABLE QString screenNameAt(const QPointF &globalPoint) const;
     Q_INVOKABLE void floatWindow(const QString &title, int width, int height) const;
