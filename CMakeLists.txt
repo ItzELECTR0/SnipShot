@@ -74,4 +74,4 @@ target_compile_definitions(snipshot PRIVATE SNIPSHOT_VERSION="${PROJECT_VERSION}
 target_link_libraries(snipshot PRIVATE
     snipshot_core Qt6::Quick Qt6::Qml Qt6::QuickControls2 Qt6::DBus LayerShellQt::Interface)
 install(TARGETS snipshot RUNTIME DESTINATION bin)
-install(FILES data/io.github.ItzELECTR0.SnipShot.desktop DESTINATION share/applications)
+install(FILES data/net.electris.SnipShot.desktop DESTINATION share/applications)

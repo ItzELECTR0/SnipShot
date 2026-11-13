@@ -6,14 +6,14 @@
 
 #include <functional>
 
-inline constexpr auto SnipShotService = "io.github.ItzELECTR0.SnipShot";
-inline constexpr auto SnipShotObjectPath = "/io/github/ItzELECTR0/SnipShot";
+inline constexpr auto SnipShotService = "net.electris.SnipShot";
+inline constexpr auto SnipShotObjectPath = "/net/electris/SnipShot";
 
 class CaptureBackend;
 
 class InstanceService final : public QObject {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.ItzELECTR0.SnipShot")
+    Q_CLASSINFO("D-Bus Interface", "net.electris.SnipShot")
 
 public:
     explicit InstanceService(CaptureBackend *backend, QObject *parent = nullptr);
