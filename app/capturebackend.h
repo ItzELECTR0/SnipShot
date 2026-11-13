@@ -160,7 +160,7 @@ private:
     void setWindows(bool &flag, bool value);
     void hidePill();
     void freeze();
-    void finishFreeze(QHash<QString, QImage> images, QVariantList windows, bool windowsSupported, QString error);
+    void finishFreeze(QHash<QString, QImage> images, QVariantList windows, bool windowsSupported, QString focused, QString error);
     QImage compose(const QRectF &rect, const QVariantList &path) const;
     void finishSnip(QImage image, bool extractText);
     void beginRecorder();
@@ -210,6 +210,7 @@ private:
     bool m_snipOpen{false};
     bool m_textOpen{false};
     bool m_openSnipAfterCapture{false};
+    QString m_fullscreen;
     QStringList m_ocrLanguages;
     uint m_notificationId{0};
     QString m_saveSourcePath;

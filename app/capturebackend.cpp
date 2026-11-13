@@ -32,6 +32,7 @@
 #include <array>
 #include <atomic>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -101,6 +102,7 @@ CaptureBackend::~CaptureBackend() {
 
 void CaptureBackend::handleCommand(const QStringList &arguments) {
     QString command = "open";
+    QString fullscreen;
     int delay = -1;
     for (int index = 0; index < arguments.size(); ++index) {
         const QString &argument = arguments.at(index);
@@ -108,6 +110,9 @@ void CaptureBackend::handleCommand(const QStringList &arguments) {
             delay = arguments.at(++index).toInt();
         } else if (argument == "--mode" && index + 1 < arguments.size()) {
             setMode(arguments.at(++index));
+        } else if (argument == "--fullscreen") {
+            const QString next = arguments.value(index + 1);
+            fullscreen = next == "focused" || next == "all" ? arguments.at(++index) : "all";
         } else if (!argument.startsWith("--")) {
             command = argument;
         } else if (argument == "--daemon") {
@@ -115,7 +120,10 @@ void CaptureBackend::handleCommand(const QStringList &arguments) {
         }
     }
     if (command == "open") showMain();
-    else if (command == "snip") start("snip", delay);
+    else if (command == "snip") {
+        if (m_state == "idle") m_fullscreen = fullscreen;
+        start("snip", delay);
+    }
     else if (command == "text") start("text", delay);
     else if (command == "record") recordingState(m_state) ? stopRecording() : start("record", delay);
     else if (command == "stop") stopRecording();
@@ -278,6 +286,7 @@ void CaptureBackend::freeze() {
         QHash<QString, QImage> images;
         QVariantList windows;
         bool windowsSupported{false};
+        QString focused;
         QString error;
         std::atomic<int> remaining{0};
     };
@@ -288,7 +297,7 @@ void CaptureBackend::freeze() {
     auto finished = [self, shared] {
         if (--shared->remaining != 0) return;
         QMetaObject::invokeMethod(self, [self, shared] {
-            if (self) self->finishFreeze(shared->images, shared->windows, shared->windowsSupported, shared->error);
+            if (self) self->finishFreeze(shared->images, shared->windows, shared->windowsSupported, shared->focused, shared->error);
         }, Qt::QueuedConnection);
     };
     for (QScreen *screen : screens) {
@@ -309,7 +318,15 @@ void CaptureBackend::freeze() {
             finished();
         });
     }
-    QThreadPool::globalInstance()->start([shared, finished] {
+    QThreadPool::globalInstance()->start([shared, finished, focusedOnly = m_fullscreen == "focused"] {
+        if (focusedOnly) {
+            std::array<char, 256> name{};
+            std::array<char, 512> error{};
+            const bool found = snipshot_focused_output(name.data(), name.size(), error.data(), error.size()) == SNIPSHOT_OK;
+            QMutexLocker lock(&shared->mutex);
+            if (found) shared->focused = text(name.data());
+            else shared->error = text(error.data());
+        }
         std::array<char, 65536> rects{};
         std::array<char, 512> error{};
         const int result = snipshot_windows(rects.data(), rects.size(), error.data(), error.size());
@@ -330,8 +347,10 @@ void CaptureBackend::freeze() {
     });
 }
 
-void CaptureBackend::finishFreeze(QHash<QString, QImage> images, QVariantList windows, bool windowsSupported, QString error) {
+void CaptureBackend::finishFreeze(QHash<QString, QImage> images, QVariantList windows, bool windowsSupported, QString focused,
+                                  QString error) {
     if (m_state != "freezing") return;
+    const QString fullscreen = std::exchange(m_fullscreen, QString());
     if (!error.isEmpty() || images.isEmpty()) {
         setState("idle");
         setStatus(error);
@@ -340,6 +359,22 @@ void CaptureBackend::finishFreeze(QHash<QString, QImage> images, QVariantList wi
         return;
     }
     m_overlays->images()->setImages(std::move(images));
+    if (!fullscreen.isEmpty()) {
+        QRectF rect;
+        for (QScreen *screen : QGuiApplication::screens())
+            if (fullscreen == "all" || screen->name() == focused) rect |= QRectF(screen->geometry());
+        if (rect.isEmpty()) {
+            m_overlays->images()->setImages({});
+            setState("idle");
+            showPill(tr("Could not find the focused screen"), "dismiss_regular", false, 5000);
+            return;
+        }
+        const QImage image = compose(rect, {});
+        m_overlays->images()->setImages({});
+        setState("processing");
+        finishSnip(image, false);
+        return;
+    }
     ++m_frozenSerial;
     emit frozenSerialChanged();
     m_windowRects = windows;
@@ -353,6 +388,7 @@ void CaptureBackend::finishFreeze(QHash<QString, QImage> images, QVariantList wi
 }
 
 void CaptureBackend::cancel() {
+    if (m_state == "delaying") m_fullscreen.clear();
     if (m_state == "delaying" || m_state == "countdown") m_countdownTimer.stop();
     if (m_state == "delaying") hidePill();
     if (m_state == "selecting" || m_state == "armed" || m_state == "countdown") {

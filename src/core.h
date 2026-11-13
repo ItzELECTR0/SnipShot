@@ -27,6 +27,7 @@ typedef struct SnipShotRecordOptions {
 } SnipShotRecordOptions;
 
 int snipshot_freeze(const char *output_name, char *path, size_t path_capacity, char *error, size_t error_capacity);
+int snipshot_focused_output(char *name, size_t capacity, char *error, size_t error_capacity);
 int snipshot_windows(char *rects, size_t capacity, char *error, size_t error_capacity);
 int snipshot_output_path(int kind, const char *directory, const char *extension, char *path, size_t path_capacity,
                          char *error, size_t error_capacity);

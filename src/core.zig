@@ -480,6 +480,35 @@ export fn snipshot_windows(rects: [*]u8, capacity: usize, errbuf: [*]u8, error_c
     return 0;
 }
 
+fn focusedOutput(outputs_json: []const u8, destination: [*]u8, capacity: usize) !bool {
+    const outputs = try std.json.parseFromSlice(std.json.Value, allocator, outputs_json, .{});
+    defer outputs.deinit();
+    for (jsonArray(outputs.value) orelse return error.InvalidJson) |output| {
+        const fields = jsonObject(output) orelse continue;
+        if (!jsonBool(fields.get("focused"))) continue;
+        const name = fields.get("name") orelse continue;
+        if (name != .string) continue;
+        copyOut(destination, capacity, name.string);
+        return true;
+    }
+    return false;
+}
+
+export fn snipshot_focused_output(name: [*]u8, capacity: usize, errbuf: [*]u8, error_capacity: usize) c_int {
+    const argv: []const ?[*:0]const u8 = if (getenv("HYPRLAND_INSTANCE_SIGNATURE") != null)
+        &.{ "hyprctl", "-j", "monitors" }
+    else if (getenv("SWAYSOCK") != null)
+        &.{ "swaymsg", "-r", "-t", "get_outputs" }
+    else {
+        copyOut(errbuf, error_capacity, "Focused screen snips are not supported on this desktop yet");
+        return @intFromEnum(Result.unsupported);
+    };
+    const outputs = runCapture(argv) orelse return fail(errbuf, error_capacity, "Could not list the screens");
+    defer allocator.free(outputs);
+    const found = focusedOutput(outputs, name, capacity) catch return fail(errbuf, error_capacity, "Could not read the screen list");
+    return if (found) 0 else fail(errbuf, error_capacity, "No screen has focus");
+}
+
 export fn snipshot_output_path(kind: c_int, directory: ?[*:0]const u8, extension: [*:0]const u8, path: [*]u8, path_capacity: usize, errbuf: [*]u8, error_capacity: usize) c_int {
     const destination = outputPath(@enumFromInt(kind), directory, std.mem.span(extension)) catch
         return fail(errbuf, error_capacity, "Could not create the output folder");
@@ -915,6 +944,15 @@ test "sway windows include floating views first" {
     var text: [256]u8 = undefined;
     formatWindows(windows.items, &text, text.len);
     try std.testing.expectEqualStrings("100 100 200 100\n0 0 640 480\n", std.mem.sliceTo(&text, 0));
+}
+
+test "focused output picks the focused monitor" {
+    var name: [64]u8 = undefined;
+    try std.testing.expect(try focusedOutput(
+        \\[{"name":"DP-1","focused":false},{"name":"HDMI-A-1","focused":true}]
+    , &name, name.len));
+    try std.testing.expectEqualStrings("HDMI-A-1", std.mem.sliceTo(&name, 0));
+    try std.testing.expect(!try focusedOutput("[]", &name, name.len));
 }
 
 test "concat list escapes quotes" {

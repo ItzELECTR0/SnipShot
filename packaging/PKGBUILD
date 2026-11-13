@@ -1,6 +1,6 @@
 # Maintainer: ELECTRO
 pkgname=snipshot
-pkgver=0.0.1.r1.gcd7665d
+pkgver=0.0.1.r2.g158af02
 pkgrel=1
 pkgdesc="Snipping Tool style screenshots, screen recordings and text extraction for Wayland"
 arch=('x86_64')

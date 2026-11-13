@@ -24,6 +24,8 @@ SnipShot keeps one instance running, so commands from a keybind are instant:
 ```sh
 snipshot            # open the SnipShot window
 snipshot snip       # take a snip (add --delay 3 or --mode window)
+snipshot snip --fullscreen          # every monitor as one image, no overlay
+snipshot snip --fullscreen focused  # just the focused monitor
 snipshot text       # extract text from an area
 snipshot record     # record an area, run it again to stop
 snipshot settings
@@ -34,6 +36,7 @@ For example, in Hyprland:
 
 ```lua
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("snipshot snip"))
+hl.bind("Print", hl.dsp.exec_cmd("snipshot snip --fullscreen"))
 ```
 
 To have it ready at login without opening the window, autostart `snipshot --daemon`.

@@ -9,11 +9,15 @@ Terminal=false
 Categories=Utility;Graphics;
 Keywords=screenshot;snip;record;ocr;text;
 StartupNotify=false
-Actions=Snip;Record;Text;
+Actions=Snip;Fullscreen;Record;Text;
 
 [Desktop Action Snip]
 Name=New snip
 Exec=snipshot snip
+
+[Desktop Action Fullscreen]
+Name=Full screen snip
+Exec=snipshot snip --fullscreen
 
 [Desktop Action Record]
 Name=New recording

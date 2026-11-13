@@ -16,6 +16,10 @@ Everything here lives in `src/core.zig`. In Window mode the overlay keeps window
 - sway: `swaymsg -t get_tree` views with `visible: true`, floating before tiled, focused first. `rect` includes decorations.
 - Anything else returns `unsupported` and the Window mode button hides.
 
+## Focused output
+
+`snipshot snip --fullscreen focused` asks the compositor which output has focus (`snipshot_focused_output`): the `focused` field of `hyprctl -j monitors` or `swaymsg -t get_outputs`. Both verified (Hyprland live, sway headless). Plain `--fullscreen` composes every output and skips the overlay.
+
 ## Recording
 
 Backends are tried in order for `auto`: gpu-screen-recorder, then wf-recorder. Encoders need even sizes, so the region is rounded down. Output is always `.mp4`. Startup is confirmed by polling for up to 1.5 s: if the process exits, the last line of `recorder.log` becomes the error and `auto` falls through to the next backend.

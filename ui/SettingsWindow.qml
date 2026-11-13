@@ -333,7 +333,7 @@ Window {
             Card {
                 icon: "camera_regular"
                 title: "SnipShot"
-                description: qsTr("Bind keys to \"snipshot snip\", \"snipshot record\" and \"snipshot text\" in your desktop settings to start captures from anywhere.")
+                description: qsTr("Bind keys to \"snipshot snip\", \"snipshot snip --fullscreen\", \"snipshot record\" and \"snipshot text\" in your desktop settings to start captures from anywhere.")
             }
             Item { Layout.preferredHeight: 24 }
         }
