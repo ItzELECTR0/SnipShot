@@ -27,6 +27,17 @@ optdepends=(
     'wf-recorder: recording fallback'
     'ffmpeg: joining paused wf-recorder recordings and mixing in the mic'
     'xdg-desktop-portal: Save as dialog and following the system light or dark setting'
+    'tesseract-data-eng: English text extraction'
+    'tesseract-data-spa: Spanish text extraction'
+    'tesseract-data-por: Portuguese text extraction'
+    'tesseract-data-fra: French text extraction'
+    'tesseract-data-deu: German text extraction'
+    'tesseract-data-rus: Russian text extraction'
+    'tesseract-data-ara: Arabic text extraction'
+    'tesseract-data-chi_sim: Simplified Chinese text extraction'
+    'tesseract-data-chi_tra: Traditional Chinese text extraction'
+    'tesseract-data-jpn: Japanese text extraction'
+    'tesseract-data-kor: Korean text extraction'
 )
 
 _repodir() { cd "$startdir/.." && pwd; }
