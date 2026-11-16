@@ -2,11 +2,11 @@ Source: snipshot
 Section: graphics
 Priority: optional
 Maintainer: ELECTRO <electro@electris.net>
-# Zig 0.17 is not in the archive, so it is not listed and has to be on PATH.
+# Zig 0.17 is newer than the archive's, so it is not listed and has to be on PATH.
 Build-Depends:
  cmake,
  debhelper-compat (= 13),
- liblayershellqtinterface-dev,
+ liblayershellqtinterface-dev (>= 6.6),
  ninja-build,
  qt6-base-dev,
  qt6-declarative-dev,

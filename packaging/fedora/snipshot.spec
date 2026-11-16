@@ -12,7 +12,7 @@ ExclusiveArch:  x86_64 aarch64
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
-BuildRequires:  cmake(LayerShellQt)
+BuildRequires:  cmake(LayerShellQt) >= 6.6
 BuildRequires:  cmake(Qt6DBus)
 BuildRequires:  cmake(Qt6Multimedia)
 BuildRequires:  cmake(Qt6Qml)

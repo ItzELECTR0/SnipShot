@@ -12,11 +12,13 @@ env:
   ZIG_VERSION: 0.17.1
 
 jobs:
-  debian:
-    name: Debian 13
+  ubuntu:
+    name: Ubuntu 26.04
     runs-on: ubuntu-24.04
-    # Debian 13 carries Qt 6.8, the oldest Qt the project supports.
-    container: debian:13
+    # Ubuntu 26.04 carries Qt 6.10, the oldest Qt the project supports.
+    container: ubuntu:26.04
+    env:
+      DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Install build tools
         run: |
