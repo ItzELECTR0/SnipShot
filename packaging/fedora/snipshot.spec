@@ -58,4 +58,5 @@ ZIG_GLOBAL_CACHE_DIR=$PWD/zig-cache zig test src/core.zig -lc
 %license LICENSE fluentui-system-icons-LICENSE
 %{_bindir}/snipshot
 %{_datadir}/applications/net.electris.SnipShot.desktop
+%{_datadir}/icons/hicolor/scalable/apps/net.electris.SnipShot.svg
 %{_docdir}/%{name}/

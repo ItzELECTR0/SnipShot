@@ -1,5 +1,9 @@
 # SnipShot
 
+<p align="center">
+  <img src="data/net.electris.SnipShot.svg" alt="SnipShot logo" width="160">
+</p>
+
 SnipShot is a screenshot, screen recording and text extraction tool for Linux, modelled on the Windows Snipping Tool. It's written in Zig with a Qt Quick interface and currently targets wlroots-style Wayland compositors (Hyprland and sway are the ones I've tested).
 
 ## LICENSE

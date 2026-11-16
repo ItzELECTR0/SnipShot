@@ -41,3 +41,5 @@ Scroll views take no mouse buttons (`acceptedButtons: Qt.NoButton`), so a mouse 
 ## Icons
 
 `ui/icons/Icons.js` holds SVG path data from Microsoft's Fluent UI System Icons (MIT, licence beside it), rendered by `FluentIcon` with `QtQuick.Shapes` so they tint without Qt Svg. To add one, download `ic_fluent_<name>_24_<variant>.svg` and append its `d` attributes to `paths` under `<name>_<variant>`. The optional desktop icon theme maps names through `Theme.desktopIconNames` and falls back to the built-in path.
+
+`data/net.electris.SnipShot.svg` is the app icon, named after the app ID so `Icon=` and the Wayland app_id both find it, and installed to `share/icons/hicolor/scalable/apps`. It sticks to plain shapes, gradients and transforms, with no clip paths, masks or `pathLength`, because launchers and docs draw it with librsvg, Qt Svg or smaller SVG libraries.
