@@ -12,11 +12,12 @@ qt_policy(SET QTP0001 NEW)
 qt_policy(SET QTP0004 NEW)
 
 set(CORE_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/libsnipshot_core.a")
+# The library is linked into a PIE, and Zig only defaults to PIC against glibc.
 add_custom_command(
     OUTPUT "${CORE_LIBRARY}"
     COMMAND "${CMAKE_COMMAND}" -E env "ZIG_GLOBAL_CACHE_DIR=${CMAKE_CURRENT_BINARY_DIR}/zig-cache"
         "${ZIG_EXECUTABLE}" build-lib "${CMAKE_CURRENT_SOURCE_DIR}/src/core.zig"
-        -static -lc -O ReleaseFast "-femit-bin=${CORE_LIBRARY}"
+        -static -fPIC -lc -O ReleaseFast "-femit-bin=${CORE_LIBRARY}"
     DEPENDS src/core.zig
     VERBATIM
 )

@@ -91,6 +91,7 @@ jobs:
       - name: Install dependencies
         run: apt-get build-dep -y ./packaging
       - name: Build package
+        shell: bash
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           cp -r packaging/debian debian
