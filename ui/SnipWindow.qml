@@ -11,18 +11,25 @@ Window {
     visible: Capture.snipOpen
     title: "SnipShot Snip"
     color: Theme.surface
-    minimumWidth: 560
-    minimumHeight: 360
-    readonly property int preferredWidth: Math.max(minimumWidth, Math.min(Capture.resultSize.width + 48, Screen.desktopAvailableWidth * 0.8))
-    readonly property int preferredHeight: Math.max(minimumHeight, Math.min(Capture.resultSize.height + (image ? 140 : 190), Screen.desktopAvailableHeight * 0.8))
+    readonly property int preferredWidth: Math.max(560, Math.min(Capture.resultSize.width + 48, Screen.desktopAvailableWidth * 0.8))
+    readonly property int preferredHeight: Math.max(360, Math.min(Capture.resultSize.height + (image ? 140 : 190), Screen.desktopAvailableHeight * 0.8))
     width: preferredWidth
     height: preferredHeight
+    // Equal minimum and maximum sizes make Hyprland and sway map the window floating at that size.
+    property bool mapping: true
+    minimumWidth: mapping ? preferredWidth : 560
+    minimumHeight: mapping ? preferredHeight : 360
+    maximumWidth: mapping ? preferredWidth : 16777215
+    maximumHeight: mapping ? preferredHeight : 16777215
+    onFrameSwapped: mapping = false
     onVisibleChanged: {
         actualSize = false
         if (visible) {
             width = preferredWidth
             height = preferredHeight
             Capture.floatWindow(title, preferredWidth, preferredHeight)
+        } else {
+            mapping = true
         }
     }
     onClosing: Capture.closeSnip()
@@ -105,6 +112,7 @@ Window {
                 interactive: window.actualSize
                 ScrollBar.horizontal: Scroller { policy: window.actualSize ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff }
                 ScrollBar.vertical: Scroller { policy: window.actualSize ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff }
+                WheelScroll { view: flick }
 
                 Image {
                     readonly property real fitScale: Math.min(1, flick.width / Math.max(1, Capture.resultSize.width), flick.height / Math.max(1, Capture.resultSize.height))

@@ -13,6 +13,6 @@ SnipShot is a Linux capture tool modelled on the Windows Snipping Tool. The UI i
 
 - `.agents/architecture.md`: read before changing the process model, state machine, windows or the Zig/C++/QML split.
 - `.agents/capture-backends.md`: read before touching freeze, window lists, recorders, clipboard or OCR.
-- `.agents/theming.md`: read before changing colours, styles, palettes, icons or the Theme singleton.
+- `.agents/theming.md`: read before changing colours, styles, palettes, icons, scrolling or the Theme singleton.
 - `.agents/testing.md`: read before running the app, especially anything that captures a screen.
 - `.agents/packaging.md`: read before changing anything in `packaging/` or `.github/workflows/`, or cutting a release.

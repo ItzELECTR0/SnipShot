@@ -589,7 +589,7 @@ export fn snipshot_float_window(title: [*:0]const u8, width: c_int, height: c_in
     for (name) |character| if (character == '\'' or character == '"' or character == '\\') return @intFromEnum(Result.failed);
     if (getenv("HYPRLAND_INSTANCE_SIGNATURE") != null) {
         const script = z("local title = '{s}'; for _, w in ipairs(hl.get_windows({{ title = title }})) do " ++
-            "if w.title == title then hl.dispatch(hl.dsp.window.float({{ action = 'set', window = w }})); " ++
+            "if w.title == title then hl.dispatch(hl.dsp.window.float({{ action = 'enable', window = w }})); " ++
             "hl.dispatch(hl.dsp.window.resize({{ window = w, x = {d}, y = {d}, relative = false }})); " ++
             "hl.dispatch(hl.dsp.window.center({{ window = w }})); end end", .{ name, width, height }) catch return @intFromEnum(Result.failed);
         defer allocator.free(script);

@@ -10,12 +10,19 @@ Window {
     title: "SnipShot Settings"
     width: 680
     height: 760
-    minimumWidth: 520
-    minimumHeight: 420
+    // Equal minimum and maximum sizes make Hyprland and sway map the window floating at that size.
+    property bool mapping: true
+    minimumWidth: mapping ? 680 : 520
+    minimumHeight: mapping ? 760 : 420
+    maximumWidth: mapping ? 680 : 16777215
+    maximumHeight: mapping ? 760 : 16777215
     color: Theme.surface
+    onFrameSwapped: mapping = false
     onVisibleChanged: if (visible) {
         Appearance.rescan()
         Capture.floatWindow(title, 680, 760)
+    } else {
+        mapping = true
     }
     onClosing: Capture.closeSettings()
 
@@ -117,8 +124,10 @@ Window {
         id: flick
         anchors.fill: parent
         contentHeight: content.implicitHeight + 48
+        acceptedButtons: Qt.NoButton
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: Scroller {}
+        WheelScroll { view: flick }
 
         ColumnLayout {
             id: content

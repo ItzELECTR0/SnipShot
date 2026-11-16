@@ -11,10 +11,15 @@ Window {
     title: "SnipShot"
     width: 600
     height: 168
-    minimumWidth: 520
-    minimumHeight: 150
+    // Equal minimum and maximum sizes make Hyprland and sway map the window floating at that size.
+    property bool mapping: true
+    minimumWidth: mapping ? 600 : 520
+    minimumHeight: mapping ? 168 : 150
+    maximumWidth: mapping ? 600 : 16777215
+    maximumHeight: mapping ? 168 : 16777215
     color: Theme.surface
-    onVisibleChanged: if (visible) Capture.floatWindow(title, 600, 168)
+    onFrameSwapped: mapping = false
+    onVisibleChanged: if (visible) Capture.floatWindow(title, 600, 168); else mapping = true
     onClosing: Capture.closeMain()
 
     readonly property var modes: [

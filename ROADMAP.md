@@ -15,9 +15,9 @@
 
 ## Rough edges
 
-- On sway the snip window sometimes floats at its tiled size instead of the fitted size.
 - gpu-screen-recorder start is confirmed by polling for up to 1.5 s, so the first moment after the countdown can be cut or the timer can lag slightly.
 
 ## Unverified
 
 - Notification actions (Open, Copy, Save as) with a real notification daemon.
+- Touchpad scrolling still being kinetic.

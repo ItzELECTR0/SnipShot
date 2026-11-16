@@ -36,6 +36,8 @@ The Quick Controls style is `Basic`, set once in `main.cpp`, and the platform pa
 
 Chips expose a checkable button role, not a check box: Qt's default toggle action for a check box writes `checked` directly and breaks the binding.
 
+Scroll views take no mouse buttons (`acceptedButtons: Qt.NoButton`), so a mouse drag never scrolls them; touch and touchpads still do. `WheelScroll` moves `wheelScrollLines` times 24 px per wheel notch, because Flickable turns each wheel event into a speed-capped flick that crawls, worst with high-resolution wheels. It is a MouseArea under the content with `scrollGestureEnabled: false`, so controls get the wheel first and touchpad scrolls (synthesized events) fall through to Flickable's own kinetic scrolling. A WheelHandler cannot do this: on Wayland, wheel events carry Qt's touchpad device whenever the compositor offers pointer gestures, and the handler blocks before `onWheel` runs. The snip window's image is the exception: at actual size a mouse drag still pans it.
+
 ## Icons
 
 `ui/icons/Icons.js` holds SVG path data from Microsoft's Fluent UI System Icons (MIT, licence beside it), rendered by `FluentIcon` with `QtQuick.Shapes` so they tint without Qt Svg. To add one, download `ic_fluent_<name>_24_<variant>.svg` and append its `d` attributes to `paths` under `<name>_<variant>`. The optional desktop icon theme maps names through `Theme.desktopIconNames` and falls back to the built-in path.

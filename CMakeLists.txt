@@ -41,6 +41,7 @@ set(QML_SOURCES
     ui/MenuDivider.qml
     ui/Spinner.qml
     ui/Scroller.qml
+    ui/WheelScroll.qml
     ui/SeekSlider.qml
     ui/ColorPicker.qml
     ui/Surface.qml

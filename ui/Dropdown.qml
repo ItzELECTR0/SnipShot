@@ -80,12 +80,15 @@ ComboBox {
         implicitHeight: Math.min(contentItem.implicitHeight + 8, 320)
         padding: 4
         contentItem: ListView {
+            id: list
             clip: true
             implicitHeight: contentHeight
             model: combo.popup.visible ? combo.delegateModel : null
             currentIndex: combo.highlightedIndex
+            acceptedButtons: Qt.NoButton
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: Scroller {}
+            WheelScroll { view: list }
         }
         background: Rectangle {
             radius: Theme.controlRadius

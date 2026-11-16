@@ -55,7 +55,9 @@ Window {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 ScrollBar.vertical: Scroller { parent: scroll; x: scroll.width - width; y: 2; height: scroll.height - 4 }
+                Binding { target: scroll.contentItem; property: "acceptedButtons"; value: Qt.NoButton }
                 TextArea {
+                    WheelScroll { view: scroll.contentItem as Flickable }
                     text: Capture.recognizedText
                     readOnly: true
                     verticalAlignment: TextEdit.AlignTop
