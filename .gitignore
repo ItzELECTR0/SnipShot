@@ -2,3 +2,5 @@
 /packaging/src/
 /packaging/pkg/
 /packaging/*.pkg.tar.*
+/packaging/alpine/src/
+/packaging/alpine/pkg/

@@ -1,9 +1,9 @@
 # Maintainer: ELECTRO
 pkgname=snipshot
-pkgver=0.0.1.r3.gf65c8ba
+pkgver=0.0.1.r0.gac645d7
 pkgrel=1
 pkgdesc="Snipping Tool style screenshots, screen recordings and text extraction for Wayland"
-arch=('x86_64')
+arch=('x86_64' 'aarch64')
 license=('GPL-3.0-or-later' 'MIT')
 depends=(
     'grim'
@@ -46,9 +46,7 @@ prepare() {
 }
 
 pkgver() {
-    local _repo="$(_repodir)"
-    local _version="$(sed -n 's/^project(SnipShot VERSION \([0-9.]*\).*/\1/p' "$_repo/CMakeLists.txt")"
-    printf "%s.r%s.g%s" "$_version" "$(git -C "$_repo" rev-list --count HEAD)" "$(git -C "$_repo" rev-parse --short HEAD)"
+    "$startdir/version.sh"
 }
 
 build() {

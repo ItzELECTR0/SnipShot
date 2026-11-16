@@ -1,0 +1,196 @@
+name: Build packages
+
+on:
+  workflow_call:
+
+# SnipShot has no build.zig.zon for setup-zig to read the version from.
+env:
+  ZIG_VERSION: 0.17.1
+
+jobs:
+  arch:
+    name: Arch Linux ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+            image: archlinux:base-devel
+            keyring: archlinux-keyring
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            # Arch itself has no ARM port, so aarch64 comes from Arch Linux ARM. This image tracks
+            # it and is rebuilt daily, which the other published ones are not.
+            image: menci/archlinuxarm:base-devel
+            keyring: archlinuxarm-keyring
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.image }}
+    steps:
+      - name: Install build tools
+        # The keyring is as old as the image, and pacman's download sandbox wants a Landlock ruleset
+        # that a container is not allowed to set up, which the official image already turns off.
+        run: |
+          pacman -Sy --noconfirm --disable-sandbox ${{ matrix.keyring }}
+          pacman -Syu --noconfirm --disable-sandbox git
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+          use-cache: false
+      - name: Install dependencies
+        # Zig comes from setup-zig instead, because Arch Linux ARM's is too old.
+        run: |
+          source packaging/PKGBUILD
+          pacman -S --noconfirm --needed --disable-sandbox "${depends[@]}" $(printf '%s\n' "${makedepends[@]}" | grep -v '^zig')
+      - name: Create an unprivileged builder
+        run: |
+          useradd --create-home builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+          install -d -o builder "$ZIG_GLOBAL_CACHE_DIR"
+      - name: Build package
+        # Arch Linux ARM still compresses with xz, and one asset name per format is worth more than
+        # whichever compressor each side happens to prefer.
+        run: |
+          sed -i "s|^PKGEXT=.*|PKGEXT='.pkg.tar.zst'|" /etc/makepkg.conf
+          runuser -u builder -- bash -c 'cd "$GITHUB_WORKSPACE/packaging" && makepkg --noconfirm --nodeps'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: snipshot-arch-package-${{ matrix.arch }}
+          path: packaging/snipshot-[0-9]*.pkg.tar.zst
+          if-no-files-found: error
+
+  debian:
+    name: Debian 13 ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    container: debian:13
+    steps:
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates dpkg-dev git xz-utils
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+          use-cache: false
+      - name: Install dependencies
+        run: apt-get build-dep -y ./packaging
+      - name: Build package
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          cp -r packaging/debian debian
+          cat > debian/changelog <<CHANGELOG
+          snipshot ($(packaging/version.sh)) trixie; urgency=medium
+
+            * Built from ${GITHUB_SHA:0:7}.
+
+           -- ELECTRO <electro@electris.net>  $(date -R)
+          CHANGELOG
+          dpkg-buildpackage -b -us -uc
+          mkdir artifacts
+          mv ../snipshot_*.deb artifacts/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: snipshot-debian-package-${{ matrix.arch }}
+          path: artifacts
+          if-no-files-found: error
+
+  fedora:
+    name: Fedora 44 ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    container: fedora:44
+    steps:
+      - name: Install build tools
+        run: dnf install -y dnf5-plugins git-core rpm-build xz
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+          use-cache: false
+      - name: Build package
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          version=$(packaging/version.sh)
+          dnf builddep -y --define "pkgver $version" packaging/fedora/snipshot.spec
+          mkdir -p ~/rpmbuild/SOURCES
+          git archive --prefix=snipshot/ -o ~/rpmbuild/SOURCES/snipshot.tar.gz HEAD
+          rpmbuild -bb --define "pkgver $version" packaging/fedora/snipshot.spec
+          mkdir artifacts
+          mv ~/rpmbuild/RPMS/*/snipshot-[0-9]*.rpm artifacts/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: snipshot-fedora-package-${{ matrix.arch }}
+          path: artifacts
+          if-no-files-found: error
+
+  alpine:
+    name: Alpine ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      # Zig's release builds are static, so the one setup-zig puts on the runner runs on musl too.
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+          use-cache: false
+      # Alpine runs as a plain container instead of the job's own, because the runner's Node is
+      # linked against glibc and every action inside a musl job container fails on that alone.
+      - name: Build Alpine package
+        run: |
+          mkdir artifacts
+          docker run --rm -v "$PWD:/work" -v "$(dirname "$(readlink -f "$(command -v zig)")"):/opt/zig:ro" alpine:3.24 sh -c '
+            set -eu
+            export PATH="/opt/zig:$PATH"
+            apk add --no-cache alpine-sdk
+            git config --global --add safe.directory /work
+            abuild-keygen -na
+            cp /root/.abuild/*.rsa.pub /etc/apk/keys/
+            cd /work/packaging/alpine
+            abuild -F -r
+            find /root/packages -name "*.apk" -exec cp {} /work/artifacts/ \;
+          '
+      - name: Name the package for its architecture
+        # abuild puts the architecture in the directory it writes to rather than in the file name,
+        # and a release has nowhere to keep that.
+        run: |
+          for package in artifacts/*.apk; do
+            mv "$package" "${package%.apk}-${{ matrix.arch }}.apk"
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: snipshot-alpine-package-${{ matrix.arch }}
+          path: artifacts
+          if-no-files-found: error

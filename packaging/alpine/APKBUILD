@@ -1,0 +1,61 @@
+# Maintainer: ELECTRO <electro@electris.net>
+
+pkgname=snipshot
+pkgver=$("${startdir%/*}/version.sh" | sed 's/\.r\([0-9]*\)\.g.*/_git\1/')
+pkgrel=0
+pkgdesc="Snipping Tool style screenshots, screen recordings and text extraction for Wayland"
+url="https://github.com/ItzELECTR0/SnipShot"
+arch="x86_64 aarch64"
+license="GPL-3.0-or-later AND MIT"
+depends="
+    grim
+    gtk+3.0
+    layer-shell-qt
+    qt6-qtdeclarative
+    qt6-qtmultimedia
+    qt6-qtmultimedia-ffmpeg
+    tesseract-ocr
+    tesseract-ocr-data-eng
+    wl-clipboard
+    "
+# Zig 0.17 is newer than Alpine's, so it is not listed and has to be on PATH.
+makedepends="
+    cmake
+    git
+    layer-shell-qt-dev
+    qt6-qtbase-dev
+    qt6-qtdeclarative-dev
+    qt6-qtmultimedia-dev
+    samurai
+    "
+source=""
+builddir="$srcdir/$pkgname"
+
+prepare() {
+    _root=${startdir%/*/*}
+
+    rm -rf "$builddir"
+    mkdir -p "$builddir"
+    git -C "$_root" archive HEAD | tar -x -C "$builddir"
+}
+
+build() {
+    cd "$builddir"
+    cmake -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=None \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+}
+
+check() {
+    cd "$builddir"
+    ZIG_GLOBAL_CACHE_DIR="$builddir/build/zig-cache" zig test src/core.zig -lc
+}
+
+package() {
+    cd "$builddir"
+    DESTDIR="$pkgdir" cmake --install build
+    install -Dm644 data/themes/Midnight.json "$pkgdir/usr/share/doc/$pkgname/themes/Midnight.json"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 ui/icons/LICENSE "$pkgdir/usr/share/licenses/$pkgname/fluentui-system-icons-LICENSE"
+}

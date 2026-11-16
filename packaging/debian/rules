@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_test:
+	ZIG_GLOBAL_CACHE_DIR=$(CURDIR)/debian/zig-cache zig test src/core.zig -lc
+
+execute_after_dh_auto_install:
+	install -Dm644 data/themes/Midnight.json debian/snipshot/usr/share/doc/snipshot/themes/Midnight.json
+	install -Dm644 ui/icons/LICENSE debian/snipshot/usr/share/doc/snipshot/fluentui-system-icons-LICENSE

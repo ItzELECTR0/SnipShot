@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# SnipShot has no build.zig.zon for setup-zig to read the version from.
+env:
+  ZIG_VERSION: 0.17.1
+
+jobs:
+  debian:
+    name: Debian 13
+    runs-on: ubuntu-24.04
+    # Debian 13 carries Qt 6.8, the oldest Qt the project supports.
+    container: debian:13
+    steps:
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git xz-utils
+      - uses: actions/checkout@v7
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+          use-cache: false
+      - name: Install dependencies
+        run: apt-get build-dep -y ./packaging
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+      - name: Test
+        run: zig test src/core.zig -lc
+
+  fedora:
+    name: Fedora 44
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - name: Install build tools
+        run: dnf install -y dnf5-plugins git-core xz
+      - uses: actions/checkout@v7
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+          use-cache: false
+      - name: Install dependencies
+        # The spec takes its version from the command line, and here it only has to parse.
+        run: dnf builddep -y --define "pkgver 0" packaging/fedora/snipshot.spec
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+      - name: Test
+        run: zig test src/core.zig -lc

@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SnipShot
+Source: https://github.com/ItzELECTR0/SnipShot
+
+Files: *
+Copyright: ELECTRO
+License: GPL-3.0-or-later
+ On Debian systems, the full text of the GNU General Public License version 3
+ can be found in /usr/share/common-licenses/GPL-3.
+
+Files: ui/icons/*
+Copyright: 2020 Microsoft Corporation
+License: MIT
+ The full text is in /usr/share/doc/snipshot/fluentui-system-icons-LICENSE.
