@@ -220,6 +220,11 @@ Window {
                         onActivated: Config.delay = currentValue
                     }
                 }
+                Setting {
+                    icon: "cursor_regular"
+                    title: qsTr("Include the cursor")
+                    Toggle { checked: Config.screenshotCursor; onToggled: Config.screenshotCursor = checked }
+                }
             }
 
             Heading { text: qsTr("Screen recording") }
@@ -255,6 +260,12 @@ Window {
                     icon: "speaker_2_regular"
                     title: qsTr("Record system audio")
                     Toggle { checked: Config.systemAudio; onToggled: Capture.systemAudio = checked }
+                }
+                Setting {
+                    icon: "cursor_regular"
+                    title: qsTr("Record the cursor")
+                    description: qsTr("wf-recorder always records it.")
+                    Toggle { checked: Config.recordingCursor; onToggled: Config.recordingCursor = checked }
                 }
                 Setting {
                     icon: "folder_open_regular"

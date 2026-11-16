@@ -71,6 +71,7 @@ const SnipShotRecordOptions = extern struct {
     microphone: c_int,
     system_audio: c_int,
     framerate: c_int,
+    cursor: c_int,
     directory: ?[*:0]const u8,
 };
 
@@ -81,6 +82,7 @@ const Recording = struct {
     microphone: bool,
     system_audio: bool,
     framerate: c_int,
+    cursor: bool,
     paused: bool = false,
     recorder: c_int = -1,
     mic_recorder: c_int = -1,
@@ -443,17 +445,31 @@ fn formatWindows(windows: []WindowRect, destination: [*]u8, capacity: usize) voi
     if (capacity > 0) destination[used] = 0;
 }
 
-export fn snipshot_freeze(output_name: [*:0]const u8, path: [*]u8, path_capacity: usize, errbuf: [*]u8, error_capacity: usize) c_int {
+export fn snipshot_freeze(output_name: [*:0]const u8, cursor: c_int, path: [*]u8, path_capacity: usize, errbuf: [*]u8, error_capacity: usize) c_int {
     const runtime = runtimeDirectory() catch return fail(errbuf, error_capacity, "Could not create the runtime folder");
     defer allocator.free(runtime);
     const name = std.mem.span(output_name);
     const destination = z("{s}/freeze-{s}.ppm", .{ runtime, if (name.len > 0) name else "all" }) catch
         return fail(errbuf, error_capacity, "Out of memory");
     defer allocator.free(destination);
-    const ok = if (name.len > 0)
-        run(&.{ "grim", "-t", "ppm", "-o", output_name, destination })
-    else
-        run(&.{ "grim", "-t", "ppm", destination });
+    var argv: [7]?[*:0]const u8 = undefined;
+    var count: usize = 0;
+    for ([_][*:0]const u8{ "grim", "-t", "ppm" }) |arg| {
+        argv[count] = arg;
+        count += 1;
+    }
+    if (cursor != 0) {
+        argv[count] = "-c";
+        count += 1;
+    }
+    if (name.len > 0) {
+        argv[count] = "-o";
+        argv[count + 1] = output_name;
+        count += 2;
+    }
+    argv[count] = destination;
+    count += 1;
+    const ok = run(argv[0..count]);
     if (!ok) return fail(errbuf, error_capacity, "grim could not capture the screen. Is wlr-screencopy available?");
     copyOut(path, path_capacity, destination);
     return 0;
@@ -635,7 +651,7 @@ fn startGpuScreenRecorder(state: *Recording, errbuf: [*]u8, error_capacity: usiz
     const log = recorderLogPath() orelse return false;
     defer allocator.free(log);
     var argv: [20]?[*:0]const u8 = undefined;
-    const base = [_]?[*:0]const u8{ "gpu-screen-recorder", "-w", "region", "-region", region, "-f", framerate, "-c", "mp4", "-ac", "aac", "-cursor", "yes", "-o", state.final_path };
+    const base = [_]?[*:0]const u8{ "gpu-screen-recorder", "-w", "region", "-region", region, "-f", framerate, "-c", "mp4", "-ac", "aac", "-cursor", if (state.cursor) "yes" else "no", "-o", state.final_path };
     @memcpy(argv[0..base.len], &base);
     var count: usize = base.len;
     if (audio) |source| {
@@ -838,6 +854,7 @@ export fn snipshot_record_start(options: *const SnipShotRecordOptions, path: [*]
             .microphone = options.microphone != 0,
             .system_audio = options.system_audio != 0,
             .framerate = if (options.framerate > 0) options.framerate else 60,
+            .cursor = options.cursor != 0,
         };
         const started = switch (backend) {
             .gpu_screen_recorder => startGpuScreenRecorder(&recording.?, errbuf, error_capacity),

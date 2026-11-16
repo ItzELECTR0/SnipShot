@@ -4,7 +4,7 @@ Everything here lives in `src/core.zig`. In Window mode the overlay keeps window
 
 ## Freeze
 
-`grim -t ppm -o <output>` per output into `$XDG_RUNTIME_DIR/snipshot/`. PPM because it is raw and QImage reads it without a plugin; the host deletes the file after loading. grim applies output transforms, so a rotated monitor's image already matches its logical orientation. Images are physical pixels; the host maps logical selections by `image.width / screen.width`. Verified at scale 1.5: a 390x73 logical selection produced a 585x110 PNG.
+`grim -t ppm -o <output>` per output into `$XDG_RUNTIME_DIR/snipshot/`. PPM because it is raw and QImage reads it without a plugin; the host deletes the file after loading. grim applies output transforms, so a rotated monitor's image already matches its logical orientation. grim only draws the pointer with `-c`, passed when `screenshotCursor` is on and the capture is not for text, since a pointer only gets in OCR's way. Images are physical pixels; the host maps logical selections by `image.width / screen.width`. Verified at scale 1.5: a 390x73 logical selection produced a 585x110 PNG.
 
 `QScreen::name()` must match grim's output names (xdg-output). Verified on sway and on live Hyprland, including a selection spanning a rotated output at negative coordinates.
 
@@ -24,7 +24,8 @@ Everything here lives in `src/core.zig`. In Window mode the overlay keeps window
 
 Backends are tried in order for `auto`: gpu-screen-recorder, then wf-recorder. Encoders need even sizes, so the region is rounded down. Output is always `.mp4`. Startup is confirmed by polling for up to 1.5 s: if the process exits, the last line of `recorder.log` becomes the error and `auto` falls through to the next backend.
 
-- gpu-screen-recorder: `-w region -region WxH+X+Y` (logical coordinates, same as slurp), `-c mp4 -ac aac`. Pause is native (`SIGUSR2`), stop is `SIGINT`. Mic and system audio merge into one track with `default_output|default_input`. Verified live on Hyprland with NVIDIA: region coordinates, H.264 with AAC, pause. Region capture uses KMS through `gsr-kms-server` (`cap_sys_admin`), which reads the real GPU planes. **Never run it inside a headless test session**: it records the user's live screen, not the session.
+- gpu-screen-recorder: `-w region -region WxH+X+Y` (logical coordinates, same as slurp), `-c mp4 -ac aac`. Pause is native (`SIGUSR2`), stop is `SIGINT`. Mic and system audio merge into one track with `default_output|default_input`. `-cursor` follows `recordingCursor`. Verified live on Hyprland with NVIDIA: region coordinates, H.264 with AAC, pause. Region capture uses KMS through `gsr-kms-server` (`cap_sys_admin`), which reads the real GPU planes. **Never run it inside a headless test session**: it records the user's live screen, not the session.
+- wf-recorder always records the pointer: 0.6.0 and master hardcode `overlay_cursor` to 1 and have no option for it, so `recordingCursor` cannot apply.
 - wf-recorder: one segment per pause cycle (`<final>.part-NNN.mkv`), joined with ffmpeg concat on stop. It takes one audio device, so when both mic and system audio are wanted, system audio goes through wf-recorder and the mic through a parallel `ffmpeg -f pulse` capture per segment, mixed with `amix` at the end. Segments are kept if joining fails.
 
 ## Clipboard

@@ -300,13 +300,15 @@ void CaptureBackend::freeze() {
             if (self) self->finishFreeze(shared->images, shared->windows, shared->windowsSupported, shared->focused, shared->error);
         }, Qt::QueuedConnection);
     };
+    // OCR never wants the pointer in its pixels.
+    const int cursor = m_purpose != "text" && m_settings->flag("screenshotCursor");
     for (QScreen *screen : screens) {
         const QByteArray name = screen->name().toUtf8();
-        QThreadPool::globalInstance()->start([name, shared, finished] {
+        QThreadPool::globalInstance()->start([name, cursor, shared, finished] {
             std::array<char, 4096> path{};
             std::array<char, 512> error{};
             QImage image;
-            if (snipshot_freeze(name.constData(), path.data(), path.size(), error.data(), error.size()) == SNIPSHOT_OK) {
+            if (snipshot_freeze(name.constData(), cursor, path.data(), path.size(), error.data(), error.size()) == SNIPSHOT_OK) {
                 image.load(text(path.data()), "PPM");
                 QFile::remove(text(path.data()));
             }
@@ -580,6 +582,7 @@ void CaptureBackend::beginRecorder() {
     options.microphone = microphone();
     options.system_audio = systemAudio();
     options.framerate = m_settings->number("framerate");
+    options.cursor = m_settings->flag("recordingCursor");
     const QByteArray folder = m_settings->text("recordingFolder").toUtf8();
     struct Outcome {
         int result;
