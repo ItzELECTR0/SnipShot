@@ -56,8 +56,8 @@ The `experimental` release at the top is built from the latest commit, so it's t
 ## Prerequisites
 
 - Zig 0.17 or newer
-- Qt 6.8 or newer with Quick, Quick Controls, QML, Multimedia and D-Bus
-- LayerShellQt
+- Qt 6.10 or newer with Quick, Quick Controls, QML, Multimedia and D-Bus
+- LayerShellQt 6.6 or newer
 - CMake, Ninja and a C++20 compiler
 - `grim`, `wl-clipboard`, `tesseract` with at least one language pack, and `ffmpeg`
 - `gpu-screen-recorder` (hardware encoding) or `wf-recorder` for recording

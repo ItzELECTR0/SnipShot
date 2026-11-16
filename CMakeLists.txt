@@ -5,8 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 find_program(ZIG_EXECUTABLE zig REQUIRED)
-find_package(Qt6 6.8 REQUIRED COMPONENTS Quick Qml QuickControls2 Multimedia DBus)
-find_package(LayerShellQt REQUIRED)
+find_package(Qt6 6.10 REQUIRED COMPONENTS Quick Qml QuickControls2 Multimedia DBus)
+# 6.6 added setScreen and setWantsToBeOnActiveScreen, and it needs Qt 6.10 itself.
+find_package(LayerShellQt 6.6 REQUIRED)
 qt_policy(SET QTP0001 NEW)
 qt_policy(SET QTP0004 NEW)
 
